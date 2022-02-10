@@ -22,5 +22,4 @@ Features:
 
 IF YOU ENCOUNTER ANY BUGS OR FOR ANY SUGGESTIONS REGARDING THE IMPROVEMENT OF THE BANK MANAGEMENT SYSTEM FEEL FREE TO CONTACT US:
 
-Shivam Gupta: shivamguptasg1808@gmail.com       
-Garima Garg: ggarima163@gmail.com
+Sidharath Kumar (Sidharath1951.cse@chitkara.edu.in)
