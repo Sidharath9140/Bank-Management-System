@@ -1295,9 +1295,6 @@ int main()
   src: url(sansation_light.woff);
 }
 
-
-
-/*
 <html>
     <head>
         <title>Test</title>
@@ -1333,4 +1330,4 @@ input {
 
     </body>
 </html>*/
-*/
+
