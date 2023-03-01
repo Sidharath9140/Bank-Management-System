@@ -1289,7 +1289,7 @@ int main()
 					goto menu;
 	}
 }
-/*
+
 @font-face {
   font-family: myFirstFont;
   src: url(sansation_light.woff);
@@ -1329,5 +1329,5 @@ input {
 <input type="text" value="The quick brown fox jumps over the lazy dog" />
 
     </body>
-</html>*/
+</html>
 
