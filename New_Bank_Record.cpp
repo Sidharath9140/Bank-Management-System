@@ -1290,44 +1290,581 @@ int main()
 	}
 }
 
-@font-face {
-  font-family: myFirstFont;
-  src: url(sansation_light.woff);
+#include <iostream>
+#include <conio.h>
+#include <fstream>
+#include<stdio.h>
+#include<stdlib.h>
+#include "LinkedList.h"
+#include "LinkedList.cpp"
+using namespace std;
+int main() {
+    LinkedList<int> list;
+    int c = 0, n = 0;
+    int cInt;
+    int cInt_1;
+    bool quit = false;
+    list.readfile();
+    do {
+        cout << "====================================" << endl;
+        cout << "select option :" << endl;
+        cout << "1: insert back" << endl;
+        cout << "2: insert front" << endl;
+        cout << "3: insert at index" << endl;
+        cout << "4: display items" << endl;
+        cout << "5: get item at index" << endl;
+        cout << "6: delete back" << endl;
+        cout << "7: delete front" << endl;
+        cout << "8: delete at index" << endl;
+        cout << "9: Search an element" << endl;
+        cout << "10: Reverse the linked list" << endl;
+        cout << "11: Sort a doubly Linked List" << endl;
+        cout << "12: exit" << endl;
+        cin >> c;
+        cout << "====================================" << endl;
+        switch (c)
+        {
+        case 1:
+            cout << "enter item to insert:" << endl;
+            cin >> cInt;
+            list.add(cInt);
+            break;
+
+        case 2:
+            cout << "enter item to insert:" << endl;
+            cin >> cInt;
+            list.addFront(cInt);
+            break;
+        case 3:
+            cout << "enter item to insert:" << endl;
+            cin >> cInt;
+            cout << "enter index:" << endl;
+            cin >> cInt_1;
+            list.add(cInt_1, cInt);
+            break;
+
+        case 4:
+            list.displayAll();
+            break;
+
+        case 5:
+            cout << "enter index:" << endl;
+            cin >> cInt_1;
+            cout << "item at index " << cInt_1 << ": " << list.get(cInt_1) << endl;
+            break;
+
+        case 6:
+            list.remove();
+            break;
+        case 7:
+            list.removeFront();
+            break;
+        case 8:
+            cout << "enter index:" << endl;
+            cin >> cInt_1;
+            list.remove(cInt_1);
+            break;
+
+        case 9:
+
+            list.search();
+            break;
+
+        case 10:
+            list.reverse();
+            break;
+        case 11:
+            list.sort();
+            break;
+        case 12:
+            quit = true;
+            break;
+
+        default:
+            cout << "invalid selection" << endl;
+            break;
+        }
+    } while (!quit);
+    list.writefile();
+    return 0;
 }
 
-<html>
-    <head>
-        <title>Test</title>
-        <style>
 
-@font-face {
-  font-family: 'Space Mono';
-  font-style: normal;
-  font-weight: 400;
-  src: url(SpaceMono-Regular.ttf);
+
+
+
+
+
+
+#include <iostream>
+#include <fstream>
+#include<stdlib.h>
+#include "LinkedList.h"
+using namespace std;
+
+template<typename T>
+void 
+LinkedList<T>::add(
+    T item
+)
+{
+    Node<T>* node = new Node<T>[1];
+    node->data = item;
+    if (head == NULL) {
+        head = node;
+        cout << "new node added(firstnode) !" << endl;
+        return;
+    }
+    Node<T>* temp = head;
+    Node<T>* prev = NULL;;
+    while (temp->next != NULL) {
+        prev = temp;
+        temp = temp->next;
+    }
+    temp->next = node;
+    temp->prev = prev;
+    cout << "new node added at back!" << endl;
 }
 
-.space {
-    font-family: 'Space Mono', monospace;    
-    font-size: 16px;
+
+template<typename T>
+void
+LinkedList<T>::addback(
+    T item
+) 
+{
+    Node<T>* node = new Node<T>[1];
+    node->data = item;
+    if (head == NULL) {
+        head = node;
+        // cout << "new node added(firstnode) !" << endl;
+        return;
+    }
+    Node<T>* temp = head;
+    Node<T>* prev = NULL;;
+    while (temp->next != NULL) {
+        prev = temp;
+        temp = temp->next;
+    }
+    temp->next = node;
+    temp->prev = prev;
+    //cout << "new node added at back!" << endl;
 }
 
-input {
-    display:block;
-    width:300px;
-    font-size:16px;
+template <typename T>
+void 
+LinkedList<T>::addFront(
+    T item
+)
+{
+    Node<T>* node = new Node<T>[1];
+    node->data = item;
+    if (head == NULL) {
+        head = node;
+        cout << "new node added(firstnode) !" << endl;
+        return;
+    }
+    head->prev = node;
+    node->next = head;
+    head = node;
+    cout << "new node added at front !" << endl;
+}
+template <typename T>
+void 
+LinkedList<T>::add(
+    int index, T item
+)
+{
+    if (index > length() || index < 0) {
+        cout << "index out of bound !" << endl;
+        return;
+    }
+    Node<T>* node = new Node<T>[1];
+    node->data = item;
+    int count = 0;
+    Node<T>* temp = head;
+    while (temp != NULL && count < index) {
+        if (count == index - 1) {
+            if (temp->next != NULL) {
+                node->next = temp->next;
+            }
+            temp->next = node;
+            node->prev = temp;
+            cout << "new node added at index " << index << " !" << endl;
+            break;
+        }
+        count++;
+        temp = temp->next;
+    }
+
+}
+template <typename T>
+int
+LinkedList<T>::length(
+)
+{
+    int len = 0;
+    Node<T>* temp = head;
+    while (temp != NULL) {
+        len++;
+        temp = temp->next;
+    }
+    return len;
+}
+template <typename T>
+T 
+LinkedList<T>::get(
+    int index
+)
+{
+    if (head == NULL) {
+        cout << "linked list is empty !" << endl;
+        return -99999;
+    }
+    if (index >= length() || index < 0) {
+        cout << "index out of bound !" << endl;
+        return -99999;
+    }
+    if (index == 0) {
+        return head->data;
+    }
+    int count = 0;
+    T res = NULL;
+    Node<T>* temp = head;
+    while (temp != NULL) {
+        if (count++ == index) {
+            res = temp->data;
+            break;
+        }
+        temp = temp->next;
+    }
+    return res;
+}
+template<typename T>
+void
+LinkedList<T>::displayAll(
+)
+{
+    if (head == NULL) {
+        cout << "linked list is empty" << endl;
+        return;
+    }
+    cout << endl << "----linked list items------" << endl;
+    Node<T>* temp = head;
+    while (temp != NULL) {
+        cout << temp->data << " | ";
+        temp = temp->next;
+    }
+    cout << endl << "--------------------------" << endl;
 }
 
-        </style>
-        <script></script>
-    </head>
-    <body>
+template <typename T>
+void 
+LinkedList<T>::remove(
+    int index
+)
+{
+    if (head == NULL) {
+        cout << "linked list is empty !" << endl;
+        return;
+    }
+    if (index >= length() || index < 0) {
+        cout << "index out of bound !" << endl;
+        return;
+    }
+    if (index == 0) {
+        removeFront();
+        cout << "item removed at index " << index << endl;
+        return;
+    }
+    int count = 0;
+    Node<T>* temp = head;
+    while (temp != NULL) {
+        if (count == index - 1) {
+            temp->next = temp->next->next;
+            cout << "item removed at index " << index << endl;
+            break;
+        }
+        count++;
+        temp = temp->next;
+    }
+}
 
-<p.space>The quick brown fox jumps over the lazy dog</p>
+template <typename T>
+void
+LinkedList<T>::removeFront(
+) 
+{
+    if (head == NULL) {
+        cout << "linked list is empty !" << endl;
+        return;
+    }
+    head = head->next;
+    head->next->prev = head;
+    cout << "front item removed" << endl;
+}
+template <typename T>
+void
+LinkedList<T>::remove(
+) 
+{
+    if (head == NULL) {
+        cout << "linked list is empty !" << endl;
+        return;
+    }
+    if (head->next == NULL) {
+        head = NULL;
+        cout << "last item removed" << endl;
+        return;
+    }
 
-<input.space type="text" value="The quick brown fox jumps over the lazy dog"/>
-<input type="text" value="The quick brown fox jumps over the lazy dog" />
+    Node<T>* temp = head;
+    while (temp != NULL) {
+        if (temp->next->next == NULL) {
+            temp->next = NULL;
+            cout << "last item removed" << endl;
+            break;
+        }
+        temp = temp->next;
+    }
 
-    </body>
-</html>
+}
+template <typename T>
+void
+LinkedList<T>::search(
+)
+{
+    Node<T>* ptr;
+    T item;
+    int i = 0, flag;
+    ptr = head;
+    if (ptr == NULL)
+    {
+        cout << "Empty List" << endl;
+    }
+    else
+    {
+        cout << "Enter item which you want to search?" << endl;
+        cin >> item;
+        while (ptr != NULL)
+        {
+            if (ptr->data == item)
+            {
+                cout << "item found at index  " << i << endl;
+                flag = 0;
+                break;
+            }
+            else
+            {
+                flag = 1;
+            }
+            i++;
+            ptr = ptr->next;
+        }
+        if (flag == 1)
+        {
+            cout << "Item not found";
+        }
+    }
+}
 
+template <typename T>
+void 
+LinkedList<T>::reverse(
+)
+{
+    Node<T>* current = head;
+    Node<T>* temp = NULL;
+    if (current == NULL) {
+        cout << "Linked List is empty" << endl;
+    }
+    else
+    {
+        while (current != NULL)
+        {
+            current->prev = current->next; //line 1
+            current->next = temp;          //line 2
+            temp = current;                //line 3
+            current = current->prev;       //line 4
+        }
+        head = temp;
+        cout << "Linked List reversed successfully" << endl;
+        return;
+    }
+}
+
+template <typename T>
+void
+LinkedList<T>::sort(
+)
+{
+    Node<T>* start = head;
+    int cInt, cInt_1 = 0;
+    Node<T>* ptr1;
+    Node<T>* lptr = NULL;
+
+    if (start == NULL)
+    {
+        cout << "Linked List is empty" << endl;
+        return;
+    }
+
+    else {
+        do
+        {
+            cInt = 0;
+            ptr1 = start;
+
+            while (ptr1->next != lptr)
+            {
+                if (ptr1->data > ptr1->next->data)
+                {
+                    swap(ptr1->data, ptr1->next->data);
+                    cInt = 1;
+                }
+                ptr1 = ptr1->next;
+            }
+            lptr = ptr1;
+        } while (cInt);
+        cout << "Linked List sorted successfully" << endl;
+    }
+}
+template <typename T>
+void
+LinkedList<T>::writefile(
+)
+{
+    Node<T>* temp = head;
+    FILE* f;
+    f = fopen("..\\..\\DoublyLinkedList\\DoublyLinkedList\\test.txt", "wb");
+    while (temp != NULL) {
+        fwrite((void*)temp, sizeof(*temp), 1, f);
+        //cout<<temp->data<<endl;
+        //cout << "\nFile write data : " << temp->data << endl;
+        temp = temp->next;
+    }
+    if (fwrite != NULL)
+    {
+        cout << "Linked List stored in the file successfully\n";
+    }
+    else
+    {
+        cout << "Error While Writing\n";
+    }
+    fclose(f);
+}
+template <typename T>
+void
+LinkedList<T>::readfile(
+)
+{
+    FILE* f;
+    f = fopen("..\\..\\DoublyLinkedList\\DoublyLinkedList\\test.txt", "rb");
+    T item;
+    Node<T> tmp;
+    if (f == NULL)
+    {
+        cout << "could not open file" << endl;
+    }
+    else
+    {
+        while (fread((void*)&tmp, sizeof(tmp), 1, f))
+        {
+            //fread((void*)&tmp, sizeof(tmp), 1, f);
+            item = tmp.data;
+            //cout << "\nFile read data : " << item << endl;
+            addback(item);
+        }
+    }
+    cout << "File Reading is completed" << endl;
+    fclose(f);
+}
+  
+
+
+
+
+
+
+#ifndef Sample
+#define Sample
+#include <iostream>
+template<typename T>class Node {
+private:
+    T data;
+    Node<T>* next;
+    Node<T>* prev;
+    template<typename U>friend class LinkedList;
+public:
+    Node() {
+        this->next = NULL;
+        this->prev = NULL;
+    }
+};
+template<typename T>
+class LinkedList {
+private:
+    Node<T>* head;
+public:
+    LinkedList()
+    {
+        this->head = NULL;
+        // LinkedList<int> list;
+    }
+    void
+        add(
+            T item
+        );
+    void
+        addFront(
+            T item
+        );
+    void 
+        add(
+            int index,
+            T item
+        );
+    int 
+        length(
+        );
+    T 
+        get(
+            int index
+        );
+    void
+        displayAll(
+        );
+    void
+        remove(
+            int index
+        );
+    void
+        removeFront(
+        );
+    void
+        remove(
+        );
+    void 
+        search(
+        );
+    void
+        reverse(
+        );
+    void
+        sort(
+        );
+    void
+        readfile(
+        );
+    void
+        writefile(
+        );
+    void
+        addback(
+            T item
+        );
+    //void readfile(LinkedList &list);
+    //void writeLinkedList();*/
+};
+
+#endif // !Sample
