@@ -1290,7 +1290,47 @@ int main()
 	}
 }
 /*
-div {
+@font-face {
   font-family: myFirstFont;
+  src: url(sansation_light.woff);
 }
+
+
+
+/*
+<html>
+    <head>
+        <title>Test</title>
+        <style>
+
+@font-face {
+  font-family: 'Space Mono';
+  font-style: normal;
+  font-weight: 400;
+  src: url(SpaceMono-Regular.ttf);
+}
+
+.space {
+    font-family: 'Space Mono', monospace;    
+    font-size: 16px;
+}
+
+input {
+    display:block;
+    width:300px;
+    font-size:16px;
+}
+
+        </style>
+        <script></script>
+    </head>
+    <body>
+
+<p.space>The quick brown fox jumps over the lazy dog</p>
+
+<input.space type="text" value="The quick brown fox jumps over the lazy dog"/>
+<input type="text" value="The quick brown fox jumps over the lazy dog" />
+
+    </body>
+</html>*/
 */
