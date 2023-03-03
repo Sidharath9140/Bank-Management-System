@@ -1291,580 +1291,278 @@ int main()
 }
 
 #include <iostream>
-#include <conio.h>
+#include <list>
+#include <string>
+#include <rapidjson/writer.h>
 #include <fstream>
-#include<stdio.h>
-#include<stdlib.h>
-#include "LinkedList.h"
-#include "LinkedList.cpp"
-using namespace std;
-int main() {
-    LinkedList<int> list;
-    int c = 0, n = 0;
-    int cInt;
-    int cInt_1;
-    bool quit = false;
-    list.readfile();
-    do {
-        cout << "====================================" << endl;
-        cout << "select option :" << endl;
-        cout << "1: insert back" << endl;
-        cout << "2: insert front" << endl;
-        cout << "3: insert at index" << endl;
-        cout << "4: display items" << endl;
-        cout << "5: get item at index" << endl;
-        cout << "6: delete back" << endl;
-        cout << "7: delete front" << endl;
-        cout << "8: delete at index" << endl;
-        cout << "9: Search an element" << endl;
-        cout << "10: Reverse the linked list" << endl;
-        cout << "11: Sort a doubly Linked List" << endl;
-        cout << "12: exit" << endl;
-        cin >> c;
-        cout << "====================================" << endl;
-        switch (c)
-        {
-        case 1:
-            cout << "enter item to insert:" << endl;
-            cin >> cInt;
-            list.add(cInt);
-            break;
+#include <rapidjson/document.h>
+#include "rapidjson/filereadstream.h"
+#include "rapidjson/filewritestream.h"
+#include <rapidjson/stringbuffer.h>
+#include <cstdio>
+#include <cstdlib>
+#include <rapidjson/prettywriter.h>
 
+using namespace std;
+using namespace rapidjson;
+
+class Student {
+    string name;
+    int age;
+    int rollno;
+public:
+    Student() {
+        string name="";
+        int age=NULL;
+        int rollno=NULL;
+    }
+    Student(string n,int a,int r) {
+        name = n;
+        age = a;
+        rollno=r;
+    }
+
+    string
+        getname(
+        )
+    {
+        return name;
+    }
+    int 
+    getage(
+    )
+    {
+        return age;
+    }
+    int
+        getrollno(
+        )
+    {
+        return rollno;
+    }
+};
+
+bool
+operator<(
+    Student& a,
+    Student& b
+)
+{
+    return a.getname() < b.getname();
+}
+
+bool
+operator==(
+    Student& a,
+    Student& b
+)
+{
+    return a.getname() == b.getname();
+}
+void
+display(
+    list<Student>& listObject
+)
+{
+    if (listObject.empty())
+    {
+        cout << "List is empty" << endl;
+    }
+    list<Student>::iterator p;
+    
+        for (p = listObject.begin(); p != listObject.end(); p++) {
+            cout << "Name: " << p->getname() << ",";
+            cout << "Age: " << p->getage() << ", ";
+            cout << "Rollno: " << p->getrollno() << endl;
+        }
+    
+}
+void
+addStudentback(
+list<Student>& listObject
+)
+{
+    string name;
+    int age, rollno;
+    cout << "Enter Name of New Student" << endl;
+    cin >> name;
+    cout << "Enter Age of New Student" << endl;
+    cin >> age;
+    cout << "Enter Roll Number Of New Student" << endl;
+    cin >> rollno;
+    listObject.push_back(Student(name, age, rollno));
+    cout << "New Student Added Successfully" << endl;
+}
+void
+addStudentfront(
+    list<Student>& listObject
+)
+{
+    // list<Student>::iterator p;
+
+    string name;
+    int age, rollno;
+    cout << "Enter Name of New Student" << endl;
+    cin >> name;
+    cout << "Enter Age of New Student" << endl;
+    cin >> age;
+    cout << "Enter Roll Number Of New Student" << endl;
+    cin >> rollno;
+    listObject.push_front(Student(name, age, rollno));
+    cout << "New Student Added Successfully" << endl;
+}
+void
+writeintofile(
+    list<Student>& listObject
+)
+{
+    
+    list<Student>::iterator p;
+    rapidjson::StringBuffer sb;
+    rapidjson::Writer<rapidjson::StringBuffer> writer(sb);
+    //writer.Key("Students");
+    writer.StartObject();
+    writer.Key("Students");
+    writer.StartArray();              
+
+        for (p = listObject.begin(); p != listObject.end(); p++) {
+            
+            writer.StartObject();
+            writer.Key("Name");
+            string str = p->getname();
+            writer.String(str.c_str());
+            writer.Key("Age");
+            writer.Uint(p->getage());
+            writer.Key("RollNo.");
+            writer.Uint(p->getrollno());
+            writer.EndObject();
+           
+        }
+        writer.EndArray();
+        writer.EndObject();
+        std::ofstream ofs("..\\..\\StudentRecordUsingSTLList\\StudentRecordUsingSTLList\\output.json");
+        ofs << sb.GetString();
+        ofs.close();
+       // writer.Uint(i); 
+        cout << "List has been stored in the json file " << endl;
+}
+void
+readfromfile(
+    list<Student>& listObject
+)
+{
+    Document d;
+    Document doc;
+    FILE* fp = fopen("..\\..\\StudentRecordUsingSTLList\\StudentRecordUsingSTLList\\output.json", "rb"); 
+    char readBuffer[65536];
+    FileReadStream is(fp, readBuffer, sizeof(readBuffer));
+    d.ParseStream(is);
+    StringBuffer buffer{};
+    Writer<StringBuffer> writer{ buffer };
+    d.Accept(writer);
+    fclose(fp);
+    const std::string jsonStr{ buffer.GetString() };
+    
+
+    if (d.HasParseError())
+    {
+        std::cout << "Error  : " << d.GetParseError() << '\n'
+            << "Offset : " << d.GetErrorOffset() << '\n';
+        return;
+    }
+    doc.Parse<kParseDefaultFlags>(jsonStr.c_str());
+    
+    if (doc.HasMember("Students")) {
+       // string retjson = doc["Students"].GetString();
+        const Value& retjson = doc["Students"];
+        for (SizeType i = 0; i < retjson.Size(); ++i)
+        {
+            if (retjson[i].HasMember("Name")&&retjson[i].HasMember("Age")&&retjson[i].HasMember("RollNo."))
+            {
+                string name = retjson[i]["Name"].GetString();
+                int age = retjson[i]["Age"].GetInt();
+                int rollno = retjson[i]["RollNo."].GetInt();
+                listObject.push_back(Student(name, age, rollno));
+            }
+        }
+    }
+    cout << "File Reading is Completed" << endl;
+}
+
+int main()
+{
+    list<Student> mlistObjectA;
+    int cInt;
+    bool quit = false;
+    readfromfile(mlistObjectA);
+    //mlistObjectA.remove("Sidharath", 21, 1);
+    do {
+        
+        cout << "Enter Your Choice" << endl;
+        cout << "1: Add new Student at back"<<endl;
+        cout << "2: Add new Student at front" << endl;    
+        cout << "3: Total Number of Students" << endl;
+        cout << "4: Display" << endl;
+        cout << "5: Delete first item of the list" << endl;
+        cout << "6: Delete last item of the list" << endl;
+        cout << "7: Reverse the List" << endl;
+        cout << "8 Sort the List in Alphabetical order (By Name)" << endl;
+        cout << "9: Exit" << endl;
+        
+        
+        cin >> cInt;
+        switch (cInt) {
+        case 1:
+            addStudentback(mlistObjectA);
+            break;
         case 2:
-            cout << "enter item to insert:" << endl;
-            cin >> cInt;
-            list.addFront(cInt);
+            addStudentfront(mlistObjectA);
             break;
         case 3:
-            cout << "enter item to insert:" << endl;
-            cin >> cInt;
-            cout << "enter index:" << endl;
-            cin >> cInt_1;
-            list.add(cInt_1, cInt);
-            break;
-
+            cout << "Total Number of Students in the List are :" << mlistObjectA.size() << endl;
+            break; 
         case 4:
-            list.displayAll();
+            display(mlistObjectA);
             break;
-
         case 5:
-            cout << "enter index:" << endl;
-            cin >> cInt_1;
-            cout << "item at index " << cInt_1 << ": " << list.get(cInt_1) << endl;
-            break;
-
-        case 6:
-            list.remove();
-            break;
-        case 7:
-            list.removeFront();
-            break;
-        case 8:
-            cout << "enter index:" << endl;
-            cin >> cInt_1;
-            list.remove(cInt_1);
-            break;
-
-        case 9:
-
-            list.search();
-            break;
-
-        case 10:
-            list.reverse();
-            break;
-        case 11:
-            list.sort();
-            break;
-        case 12:
-            quit = true;
-            break;
-
-        default:
-            cout << "invalid selection" << endl;
-            break;
-        }
-    } while (!quit);
-    list.writefile();
-    return 0;
-}
-
-
-
-
-
-
-
-
-#include <iostream>
-#include <fstream>
-#include<stdlib.h>
-#include "LinkedList.h"
-using namespace std;
-
-template<typename T>
-void 
-LinkedList<T>::add(
-    T item
-)
-{
-    Node<T>* node = new Node<T>[1];
-    node->data = item;
-    if (head == NULL) {
-        head = node;
-        cout << "new node added(firstnode) !" << endl;
-        return;
-    }
-    Node<T>* temp = head;
-    Node<T>* prev = NULL;;
-    while (temp->next != NULL) {
-        prev = temp;
-        temp = temp->next;
-    }
-    temp->next = node;
-    temp->prev = prev;
-    cout << "new node added at back!" << endl;
-}
-
-
-template<typename T>
-void
-LinkedList<T>::addback(
-    T item
-) 
-{
-    Node<T>* node = new Node<T>[1];
-    node->data = item;
-    if (head == NULL) {
-        head = node;
-        // cout << "new node added(firstnode) !" << endl;
-        return;
-    }
-    Node<T>* temp = head;
-    Node<T>* prev = NULL;;
-    while (temp->next != NULL) {
-        prev = temp;
-        temp = temp->next;
-    }
-    temp->next = node;
-    temp->prev = prev;
-    //cout << "new node added at back!" << endl;
-}
-
-template <typename T>
-void 
-LinkedList<T>::addFront(
-    T item
-)
-{
-    Node<T>* node = new Node<T>[1];
-    node->data = item;
-    if (head == NULL) {
-        head = node;
-        cout << "new node added(firstnode) !" << endl;
-        return;
-    }
-    head->prev = node;
-    node->next = head;
-    head = node;
-    cout << "new node added at front !" << endl;
-}
-template <typename T>
-void 
-LinkedList<T>::add(
-    int index, T item
-)
-{
-    if (index > length() || index < 0) {
-        cout << "index out of bound !" << endl;
-        return;
-    }
-    Node<T>* node = new Node<T>[1];
-    node->data = item;
-    int count = 0;
-    Node<T>* temp = head;
-    while (temp != NULL && count < index) {
-        if (count == index - 1) {
-            if (temp->next != NULL) {
-                node->next = temp->next;
-            }
-            temp->next = node;
-            node->prev = temp;
-            cout << "new node added at index " << index << " !" << endl;
-            break;
-        }
-        count++;
-        temp = temp->next;
-    }
-
-}
-template <typename T>
-int
-LinkedList<T>::length(
-)
-{
-    int len = 0;
-    Node<T>* temp = head;
-    while (temp != NULL) {
-        len++;
-        temp = temp->next;
-    }
-    return len;
-}
-template <typename T>
-T 
-LinkedList<T>::get(
-    int index
-)
-{
-    if (head == NULL) {
-        cout << "linked list is empty !" << endl;
-        return -99999;
-    }
-    if (index >= length() || index < 0) {
-        cout << "index out of bound !" << endl;
-        return -99999;
-    }
-    if (index == 0) {
-        return head->data;
-    }
-    int count = 0;
-    T res = NULL;
-    Node<T>* temp = head;
-    while (temp != NULL) {
-        if (count++ == index) {
-            res = temp->data;
-            break;
-        }
-        temp = temp->next;
-    }
-    return res;
-}
-template<typename T>
-void
-LinkedList<T>::displayAll(
-)
-{
-    if (head == NULL) {
-        cout << "linked list is empty" << endl;
-        return;
-    }
-    cout << endl << "----linked list items------" << endl;
-    Node<T>* temp = head;
-    while (temp != NULL) {
-        cout << temp->data << " | ";
-        temp = temp->next;
-    }
-    cout << endl << "--------------------------" << endl;
-}
-
-template <typename T>
-void 
-LinkedList<T>::remove(
-    int index
-)
-{
-    if (head == NULL) {
-        cout << "linked list is empty !" << endl;
-        return;
-    }
-    if (index >= length() || index < 0) {
-        cout << "index out of bound !" << endl;
-        return;
-    }
-    if (index == 0) {
-        removeFront();
-        cout << "item removed at index " << index << endl;
-        return;
-    }
-    int count = 0;
-    Node<T>* temp = head;
-    while (temp != NULL) {
-        if (count == index - 1) {
-            temp->next = temp->next->next;
-            cout << "item removed at index " << index << endl;
-            break;
-        }
-        count++;
-        temp = temp->next;
-    }
-}
-
-template <typename T>
-void
-LinkedList<T>::removeFront(
-) 
-{
-    if (head == NULL) {
-        cout << "linked list is empty !" << endl;
-        return;
-    }
-    head = head->next;
-    head->next->prev = head;
-    cout << "front item removed" << endl;
-}
-template <typename T>
-void
-LinkedList<T>::remove(
-) 
-{
-    if (head == NULL) {
-        cout << "linked list is empty !" << endl;
-        return;
-    }
-    if (head->next == NULL) {
-        head = NULL;
-        cout << "last item removed" << endl;
-        return;
-    }
-
-    Node<T>* temp = head;
-    while (temp != NULL) {
-        if (temp->next->next == NULL) {
-            temp->next = NULL;
-            cout << "last item removed" << endl;
-            break;
-        }
-        temp = temp->next;
-    }
-
-}
-template <typename T>
-void
-LinkedList<T>::search(
-)
-{
-    Node<T>* ptr;
-    T item;
-    int i = 0, flag;
-    ptr = head;
-    if (ptr == NULL)
-    {
-        cout << "Empty List" << endl;
-    }
-    else
-    {
-        cout << "Enter item which you want to search?" << endl;
-        cin >> item;
-        while (ptr != NULL)
-        {
-            if (ptr->data == item)
+            if (mlistObjectA.empty())
             {
-                cout << "item found at index  " << i << endl;
-                flag = 0;
-                break;
+                cout << "List is empty" << endl;
             }
             else
             {
-                flag = 1;
+                mlistObjectA.pop_front();
             }
-            i++;
-            ptr = ptr->next;
-        }
-        if (flag == 1)
-        {
-            cout << "Item not found";
-        }
-    }
-}
-
-template <typename T>
-void 
-LinkedList<T>::reverse(
-)
-{
-    Node<T>* current = head;
-    Node<T>* temp = NULL;
-    if (current == NULL) {
-        cout << "Linked List is empty" << endl;
-    }
-    else
-    {
-        while (current != NULL)
-        {
-            current->prev = current->next; //line 1
-            current->next = temp;          //line 2
-            temp = current;                //line 3
-            current = current->prev;       //line 4
-        }
-        head = temp;
-        cout << "Linked List reversed successfully" << endl;
-        return;
-    }
-}
-
-template <typename T>
-void
-LinkedList<T>::sort(
-)
-{
-    Node<T>* start = head;
-    int cInt, cInt_1 = 0;
-    Node<T>* ptr1;
-    Node<T>* lptr = NULL;
-
-    if (start == NULL)
-    {
-        cout << "Linked List is empty" << endl;
-        return;
-    }
-
-    else {
-        do
-        {
-            cInt = 0;
-            ptr1 = start;
-
-            while (ptr1->next != lptr)
+            cout << "First item has been removed" << endl;
+            break;
+        case 6:
+            if (mlistObjectA.empty())
             {
-                if (ptr1->data > ptr1->next->data)
-                {
-                    swap(ptr1->data, ptr1->next->data);
-                    cInt = 1;
-                }
-                ptr1 = ptr1->next;
+                cout << "List is empty" << endl;
             }
-            lptr = ptr1;
-        } while (cInt);
-        cout << "Linked List sorted successfully" << endl;
-    }
-}
-template <typename T>
-void
-LinkedList<T>::writefile(
-)
-{
-    Node<T>* temp = head;
-    FILE* f;
-    f = fopen("..\\..\\DoublyLinkedList\\DoublyLinkedList\\test.txt", "wb");
-    while (temp != NULL) {
-        fwrite((void*)temp, sizeof(*temp), 1, f);
-        //cout<<temp->data<<endl;
-        //cout << "\nFile write data : " << temp->data << endl;
-        temp = temp->next;
-    }
-    if (fwrite != NULL)
-    {
-        cout << "Linked List stored in the file successfully\n";
-    }
-    else
-    {
-        cout << "Error While Writing\n";
-    }
-    fclose(f);
-}
-template <typename T>
-void
-LinkedList<T>::readfile(
-)
-{
-    FILE* f;
-    f = fopen("..\\..\\DoublyLinkedList\\DoublyLinkedList\\test.txt", "rb");
-    T item;
-    Node<T> tmp;
-    if (f == NULL)
-    {
-        cout << "could not open file" << endl;
-    }
-    else
-    {
-        while (fread((void*)&tmp, sizeof(tmp), 1, f))
-        {
-            //fread((void*)&tmp, sizeof(tmp), 1, f);
-            item = tmp.data;
-            //cout << "\nFile read data : " << item << endl;
-            addback(item);
+            else
+            {
+                mlistObjectA.pop_back();
+            }     
+            cout << "Last item has been removed" << endl;
+            break;
+        case 7:
+            mlistObjectA.reverse();
+            cout << "List has been reversed successfully" << endl;
+            break;
+        case 8:
+            mlistObjectA.sort();
+            cout << "List has been sorted in Alphabetical order (By name)"<<endl;
+            break;
+        case 9:
+            quit = true;
+            break;
+      
+        default:
+            cout << "Invalid Choice" << endl;
+            break;
         }
-    }
-    cout << "File Reading is completed" << endl;
-    fclose(f);
+    } while (!quit);
+    writeintofile(mlistObjectA);
+    return 0;
 }
-  
-
-
-
-
-
-
-#ifndef Sample
-#define Sample
-#include <iostream>
-template<typename T>class Node {
-private:
-    T data;
-    Node<T>* next;
-    Node<T>* prev;
-    template<typename U>friend class LinkedList;
-public:
-    Node() {
-        this->next = NULL;
-        this->prev = NULL;
-    }
-};
-template<typename T>
-class LinkedList {
-private:
-    Node<T>* head;
-public:
-    LinkedList()
-    {
-        this->head = NULL;
-        // LinkedList<int> list;
-    }
-    void
-        add(
-            T item
-        );
-    void
-        addFront(
-            T item
-        );
-    void 
-        add(
-            int index,
-            T item
-        );
-    int 
-        length(
-        );
-    T 
-        get(
-            int index
-        );
-    void
-        displayAll(
-        );
-    void
-        remove(
-            int index
-        );
-    void
-        removeFront(
-        );
-    void
-        remove(
-        );
-    void 
-        search(
-        );
-    void
-        reverse(
-        );
-    void
-        sort(
-        );
-    void
-        readfile(
-        );
-    void
-        writefile(
-        );
-    void
-        addback(
-            T item
-        );
-    //void readfile(LinkedList &list);
-    //void writeLinkedList();*/
-};
-
-#endif // !Sample
